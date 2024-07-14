@@ -1,0 +1,19 @@
+-- Creating the Procedure
+CREATE PROCEDURE average_age(IN department_id INT, OUT avg_age DECIMAL(5, 2))
+BEGIN
+    SELECT AVG(age)
+    INTO avg_age
+    FROM employees
+    WHERE dept_id = department_id;
+END;
+
+-- Calling the Procedure
+
+-- Step 1: Create output variable
+SET @average_age = 0;
+
+-- Step 2: Call the procedure with input and output parameters
+CALL average_age(1, @average_age);  -- Using department ID 1 as an example
+
+-- Step 3: Retrieve and display the result
+SELECT @average_age;
