@@ -1,0 +1,27 @@
+-- Create the Procedure
+CREATE OR REPLACE PROCEDURE categorize_employees AS
+BEGIN
+    FOR employee IN (SELECT employee_id, salary, dept_id FROM employees) LOOP
+        -- Categorize by salary using IF-ELSE
+        IF employee.salary < 2000 THEN
+            DBMS_OUTPUT.PUT_LINE('Employee ' || employee.employee_id || ': Low salary');
+        ELSIF employee.salary BETWEEN 2000 AND 5000 THEN
+            DBMS_OUTPUT.PUT_LINE('Employee ' || employee.employee_id || ': Medium salary');
+        ELSE
+            DBMS_OUTPUT.PUT_LINE('Employee ' || employee.employee_id || ': High salary');
+        END IF;
+
+        -- Handle different departments using CASE
+        CASE employee.dept_id
+            WHEN 10 THEN
+                DBMS_OUTPUT.PUT_LINE('Employee ' || employee.employee_id || ': Department 10 - HR');
+            WHEN 20 THEN
+                DBMS_OUTPUT.PUT_LINE('Employee ' || employee.employee_id || ': Department 20 - Finance');
+            WHEN 30 THEN
+                DBMS_OUTPUT.PUT_LINE('Employee ' || employee.employee_id || ': Department 30 - IT');
+            ELSE
+                DBMS_OUTPUT.PUT_LINE('Employee ' || employee.employee_id || ': Other Department');
+        END CASE;
+    END LOOP;
+END;
+/
