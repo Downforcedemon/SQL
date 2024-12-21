@@ -82,3 +82,29 @@ SignupWithTrips CTE:
 Final Query:
 
     Uses SignupWithTrips to calculate the success percentage of signups that completed trips within 7 days.
+
+    // alternative solution
+WITH signups AS (
+    SELECT 
+        RIDER_ID,
+        CITY_ID,
+        CAST(TIMESTAMP AS DATE) AS SIGNUP_DATE
+    FROM signup_events
+    WHERE EVENT_NAME = 'su_success'
+      AND CAST(TIMESTAMP AS DATE) BETWEEN TO_DATE('2022-01-01', 'YYYY-MM-DD') AND TO_DATE('2022-01-07', 'YYYY-MM-DD')
+),
+first_trips_in_168_hours AS (
+    SELECT DISTINCT t.CLIENT_ID AS DRIVER_ID
+    FROM signup_events s
+    JOIN trip_details t ON s.RIDER_ID = t.CLIENT_ID
+    WHERE t.STATUS = 'completed'
+      AND t.ACTUAL_TIME_OF_ARRIVAL - s.TIMESTAMP <= INTERVAL '168' HOUR
+)
+SELECT 
+    s.CITY_ID, 
+    s.SIGNUP_DATE, 
+    CAST(COUNT(t.DRIVER_ID) AS FLOAT) / COUNT(s.RIDER_ID) * 100.0 AS PERCENTAGE
+FROM signups s
+LEFT JOIN first_trips_in_168_hours t ON s.RIDER_ID = t.DRIVER_ID
+GROUP BY s.CITY_ID, s.SIGNUP_DATE;
+
